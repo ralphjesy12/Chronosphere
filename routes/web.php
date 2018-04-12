@@ -23,4 +23,6 @@ if (!env('ALLOW_REGISTRATION', false)) {
 
 Route::resource('projects', 'ProjectController');
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::patch('project/{project}/backup','ProjectController@backup')->name('project.backup');
+
+Route::get('/', 'HomeController@index')->name('home');

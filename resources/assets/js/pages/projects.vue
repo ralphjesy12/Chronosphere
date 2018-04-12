@@ -1,17 +1,15 @@
 <template>
-    <div class="ui segments mt-10">
-        <div class="ui segment">
-            <h2 class="ui sub header">
-                Project List
-            </h2>
+    <div>
+        <h1 class="ui header">Projects</h1>
+        <div class="ui tiny breadcrumb mb-5">
+            <router-link :to="{  name : 'dashboard.index' }" class="section">Dashboard</router-link>
+            <i class="right chevron icon divider"></i>
+            <div class="active section">Projects</div>
         </div>
-        <table class="ui attached celled striped table">
+        <table class="ui attached celled striped table mb-5">
             <thead>
                 <tr>
                     <th> Name </th>
-                    <th> Files </th>
-                    <th> Backups </th>
-                    <th> Last Backup </th>
                     <th> Actions </th>
                 </tr>
             </thead>
@@ -31,40 +29,8 @@
                         <tr v-for="project in projects">
                             <td>{{ project.name }}</td>
                             <td>
-                                <div class="ui list">
-                                    <template v-if="project.directories.length > 0">
-                                        <div class="item" v-for="directory in project.directories">
-                                            <i class="folder icon"></i>
-                                            <div class="content">
-                                                {{ getBasename(directory.path) }}<br>
-                                                <small>{{ directory.path }}</small>
-                                            </div>
-                                        </div>
-                                    </template>
-                                    <template v-if="project.databases.length > 0">
-                                        <div class="item" v-for="database in project.databases">
-                                            <i class="database icon"></i>
-                                            <div class="content">
-                                                {{ database.name }}<br>
-                                                <small>{{ database.user }}@{{ database.host }}</small>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="ui mini statistic">
-                                    <div class="value">
-                                        {{ project.backups.length }}
-                                    </div>
-                                    <div class="label">
-                                        Backups
-                                    </div>
-                                </div>
-                            </td>
-                            <td> - </td>
-                            <td>
                                 <div class="ui icon buttons">
+                                    <router-link :to="{  name : 'project.show' , params: { id : project.id } }" class="ui button"><i class="folder icon"></i></router-link>
                                     <button class="ui button" @click.prevent.self="backupProject(project.id,$event)"><i class="save icon"></i></button>
                                     <button class="ui button"><i class="download icon"></i></button>
                                     <button class="ui button"><i class="edit icon"></i></button>
@@ -83,9 +49,7 @@
                 </template>
             </tbody>
         </table>
-        <div class="ui bottom attached segment">
-            <button class="ui positive mini button" @click="addProject"><i class="plus icon"></i>Add a Project</button>
-        </div>
+        <button class="ui positive mini button" @click="addProject"><i class="plus icon"></i>Add a Project</button>
         <div id="add-project-modal" class="ui modal">
             <div class="header">Add Project</div>
             <div class="content">
@@ -192,6 +156,21 @@
                     </div>
                     <div class="clearfix"> </div>
                     <div class="ui error message"></div>
+                    <template v-if="projectSavingError">
+                        <div class="ui error visible message">
+                            <i class="close icon"></i>
+                            <div class="header">
+                                {{ projectSavingError.message }}
+                            </div>
+                            <ul class="list">
+                                <li v-for="errors in projectSavingError.errors">
+                                    <template v-for="error in errors">
+                                        {{ error }}
+                                    </template>
+                                </li>
+                            </ul>
+                        </div>
+                    </template>
                     <template v-if="!(directories.length == 0 && !dbTest)">
                         <button id="btn-save-project" class="ui positive mini button" @click.prevent="saveProject"><i class="plus icon"></i>Save Project</button>
                     </template>
@@ -199,13 +178,16 @@
             </div>
         </div>
     </div>
+
 </template>
 
 <script>
+window._ = require('lodash');
 export default {
     data(){
         return {
             projectsLoading : true,
+            projectSavingError : false,
             projects : [],
             searchPath : '',
             folderPath : '',
@@ -428,10 +410,31 @@ export default {
                 })
                 .then(function(response){
                     console.log(response);
+
+                    $('#add-project-modal').modal('hide');
+                })
+                .catch(function(error){
+
+                    let originalText = $('#btn-save-project').html();
+
+                    _this.projectSavingError = error.response.data;
+
+                    $('#btn-save-project')
+                    .removeClass('loading')
+                    .html('Saving Failed')
+                    .addClass('negative');
+
+                    setTimeout(function(){
+                        $('#btn-save-project')
+                        .removeClass('negative')
+                        .html(originalText);
+
+                        _this.projectSavingError = false;
+                    },3000);
+
                 })
                 .then(function (response) {
                     $('#btn-save-project').removeClass('loading');
-                    $('#add-project-modal').modal('hide');
                     _this.getProjectList();
                 });
 

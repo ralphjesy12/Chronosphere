@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Project;
 use Illuminate\Http\Request;
+use App\Http\Resources\ProjectCollection;
+use App\Jobs\BackupProject;
 
 class ProjectController extends Controller
 {
@@ -14,7 +16,7 @@ class ProjectController extends Controller
     */
     public function index()
     {
-        //
+        return new ProjectCollection(Project::all());
     }
 
     /**
@@ -36,7 +38,7 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $this->validate($request,[
-            'project.name' => 'required'
+            'project.name' => 'required|unique:projects,name'
         ]);
 
         $project = Project::create([
@@ -82,7 +84,9 @@ class ProjectController extends Controller
     */
     public function show(Project $project)
     {
-        //
+        return response()->json([
+            'project' => $project->load([ 'directories' , 'backups' , 'databases' ])
+        ]);
     }
 
     /**
@@ -116,6 +120,19 @@ class ProjectController extends Controller
     */
     public function destroy(Project $project)
     {
-        //
+        $project->delete();
+
+        return response()->json([
+            'status' => 'Project deleted successfully!'
+        ]);
+    }
+
+    public function backup(Project $project)
+    {
+        dispatch(new BackupProject($project));
+
+        return response()->json([
+            'status' => 'Project Backup queued successfully!'
+        ]);
     }
 }

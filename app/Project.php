@@ -22,5 +22,8 @@ class Project extends Model
     public function databases(){
         return $this->hasMany('App\Database');
     }
+    public function backups(){
+        return $this->hasMany('App\Backup');
+    }
 
 }

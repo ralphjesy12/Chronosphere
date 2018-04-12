@@ -7,7 +7,11 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
+
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+
+Vue.use(VueRouter);
 
 Vue.component(
     'passport-clients',
@@ -24,8 +28,16 @@ Vue.component(
     require('./components/passport/PersonalAccessTokens.vue')
 );
 
-Vue.component('dashboard', require('./components/Dashboard.vue'));
+// Vue.component('dashboard', require('./components/Dashboard.vue'));
+
+import routes from './routes.js';
+import store from './storage.js'
+
+const router = new VueRouter({
+  routes
+});
 
 const app = new Vue({
-    el: '#app'
-});
+    router,
+    store
+}).$mount('#app');

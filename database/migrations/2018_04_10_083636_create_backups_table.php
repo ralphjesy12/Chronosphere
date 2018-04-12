@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateDatabasesTable extends Migration
+class CreateBackupsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,14 @@ class CreateDatabasesTable extends Migration
      */
     public function up()
     {
-        Schema::create('databases', function (Blueprint $table) {
+        Schema::create('backups', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('project_id')->index();
-            $table->string('host');
-            $table->string('name');
-            $table->string('user');
-            $table->string('pass')->nullable();
-            $table->string('port')->nullable();
-            $table->string('socket')->nullable();
+            $table->string('status')->default('processing');
+            $table->string('description')->nullable();
+            $table->timestamp('backup_started_at')->nullable();
+            $table->timestamp('backup_failed_at')->nullable();
+            $table->timestamp('backup_finished_at')->nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +32,6 @@ class CreateDatabasesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('databases');
+        Schema::dropIfExists('backups');
     }
 }
