@@ -1,9 +1,54 @@
 
 // Fonts
-@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
+// @import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
 
 // Variables
 // @import "variables";
 
 // Bootstrap
 // @import "~bootstrap-sass/assets/stylesheets/bootstrap";
+
+$gray: #414854;
+$teal: #3CBEB5;
+$purple: #582664;
+
+html,body{
+    background: $gray;
+}
+
+.fullheight{
+    min-height: 100vh!important;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.bg-gray{
+    background-color: $gray;
+}
+
+.bg-gray-2{
+    background-color: lighten($gray, 25);
+}
+
+.bg-gray-3{
+    background-color: lighten($gray, 50);
+}
+
+.bg-teal{
+    background-color: $teal!important;
+}
+
+.text-white{
+    color: #fff;
+}
+
+.text-gray{
+    color: $gray;
+}
+
+.btn-teal{
+    background-color: $teal!important;
+    color: #fff!important;
+}

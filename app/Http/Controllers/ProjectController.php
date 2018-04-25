@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Resources\ProjectCollection;
 use App\Jobs\BackupProject;
 
+use Artisan;
+
 class ProjectController extends Controller
 {
     /**
@@ -42,9 +44,19 @@ class ProjectController extends Controller
         ]);
 
         $project = Project::create([
-            'name' => $request->get('project')['name'],
-            'urls' => $request->get('project')['url']
+            'name' => $request->get('project')['name']
         ]);
+
+
+        if($urls = $request->get('project')['url']){
+
+            foreach ($urls as $key => $url) {
+                // $exitCode = Artisan::callSilent('monitor:create', [
+                //     'url' => $url, '--queue' => 'default'
+                // ]);
+            }
+
+        }
 
 
         if($request->has('directories')){

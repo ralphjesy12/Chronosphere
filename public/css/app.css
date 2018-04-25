@@ -1,2 +1,44 @@
-@import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
+html,
+body {
+  background: #414854;
+}
+
+.fullheight {
+  min-height: 100vh !important;
+}
+
+.flex-1 {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.bg-gray {
+  background-color: #414854;
+}
+
+.bg-gray-2 {
+  background-color: #7b8699;
+}
+
+.bg-gray-3 {
+  background-color: #c3c8d1;
+}
+
+.bg-teal {
+  background-color: #3CBEB5 !important;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.text-gray {
+  color: #414854;
+}
+
+.btn-teal {
+  background-color: #3CBEB5 !important;
+  color: #fff !important;
+}
 

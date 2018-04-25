@@ -1,55 +1,74 @@
 <template>
     <div>
-        <h1 class="ui header">Projects</h1>
-        <div class="ui tiny breadcrumb mb-5">
-            <router-link :to="{  name : 'dashboard.index' }" class="section">Dashboard</router-link>
-            <i class="right chevron icon divider"></i>
-            <div class="active section">Projects</div>
-        </div>
-        <table class="ui attached celled striped table mb-5">
-            <thead>
-                <tr>
-                    <th> Name </th>
-                    <th> Actions </th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="ui segments">
+            <div class="ui segment">
+                <div class="text-center p-5">
+                    <h3 class="ui header text-uppercase">
+                        <div class="sub header">Manage Projects</div>
+                        Projects List
+                    </h3>
+                    <p class="w-75 mx-auto text-gray">
+                        You can check here the uptime status and backup health of your projects.
+                    </p>
+                </div>
+                <div class="ui hidden divider"></div>
+
                 <template v-if="projectsLoading">
-                    <tr>
-                        <td colspan="5" class="text-center">
-                            <div class="ui tiny progress">
-                                <div class="bar"></div>
-                                <div class="label">Loading Project List..</div>
-                            </div>
-                        </td>
-                    </tr>
+                    <div class="ui teal tiny progress"  data-value="30" data-total="100" >
+                        <div class="bar"></div>
+                        <div class="label">Loading Project List..</div>
+                    </div>
                 </template>
                 <template v-else>
                     <template v-if="projects.length > 0">
-                        <tr v-for="project in projects">
-                            <td>{{ project.name }}</td>
-                            <td>
-                                <div class="ui icon buttons">
-                                    <router-link :to="{  name : 'project.show' , params: { id : project.id } }" class="ui button"><i class="folder icon"></i></router-link>
-                                    <button class="ui button" @click.prevent.self="backupProject(project.id,$event)"><i class="save icon"></i></button>
-                                    <button class="ui button"><i class="download icon"></i></button>
-                                    <button class="ui button"><i class="edit icon"></i></button>
-                                    <button class="ui button" @click.prevent.self="deleteProject(project.id,$event)"><i class="trash icon"></i></button>
+                        <div class="ui cards p-5">
+                            <router-link :to="{  name : 'project.show' , params: { id : project.id } }" class="card" v-for="project in projects" :key="project.id">
+                                <div class="content text-center">
+                                    <h5 class="ui header">
+                                        <div class="content text-uppercase">
+                                            <div class="sub header">{{ project.type }}</div>
+                                            {{ project.name }}
+                                        </div>
+                                    </h5>
+                                    <line-chart :chart-data="project.data" :height="200"/>
                                 </div>
-                            </td>
-                        </tr>
+                            </router-link>
+                            <a class="card" @click.prevent="addProject">
+                                <div class="content py-5 text-center">
+                                    <h3 class="ui icon header">
+                                        <i class="plus icon"></i>
+                                        <div class="content">
+                                            Add more projects
+                                            <div class="sub header">Click here to add</div>
+                                        </div>
+                                    </h3>
+                                </div>
+                            </a>
+                        </div>
                     </template>
                     <template v-else>
-                        <tr>
-                            <td colspan="5" class="text-center">
-                                No Projects Yet.
-                            </td>
-                        </tr>
+                        <div class="ui cards p-5">
+                            <a class="card" @click.prevent="addProject">
+                                <div class="content py-5 text-center">
+                                    <h3 class="ui icon header">
+                                        <i class="plus icon"></i>
+                                        <div class="content">
+                                            No projects yet
+                                            <div class="sub header">Add a project now</div>
+                                        </div>
+                                    </h3>
+                                </div>
+                            </a>
+                        </div>
                     </template>
                 </template>
-            </tbody>
-        </table>
-        <button class="ui positive mini button" @click="addProject"><i class="plus icon"></i>Add a Project</button>
+                <div class="ui hidden divider"></div>
+                <div class="text-center">
+                    <router-link to="/dashboard" class="ui tiny teal button text-uppercase mx-auto">Back to Dashboard</router-link>
+                </div>
+            </div>
+        </div>
+
         <div id="add-project-modal" class="ui modal">
             <div class="header">Add Project</div>
             <div class="content">
@@ -183,12 +202,27 @@
 
 <script>
 window._ = require('lodash');
+import LineChart from '../components/charts/BarChart'
 export default {
     data(){
         return {
             projectsLoading : true,
             projectSavingError : false,
-            projects : [],
+            projects : [{
+                id : 1,
+                name : 'Phinma Energy Customer Portal',
+                type : 'Laravel',
+                data : {
+                    labels: [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
+                    datasets: [{
+                        label: 'Uptime ',
+                        data: [99.5, 99.3, 99.4, 99.1, 99.9, 100, 100],
+                        backgroundColor: '#00b5ad',
+                        borderColor: '#00b5ad',
+                        borderWidth: 1
+                    }]
+                }
+            }],
             searchPath : '',
             folderPath : '',
             folderName : 'Untitled Folder',
@@ -218,6 +252,9 @@ export default {
                 root : ''
             }
         }
+    },
+    components: {
+        LineChart
     },
     watch: {
         // whenever question changes, this function will run
@@ -276,17 +313,26 @@ export default {
             let _this = this;
             _this.projects = [];
 
+            $('.ui.progress').progress();
+
             _this.projectsLoading = true;
             // Get the list of projects
             axios.get('/projects').then(res => {
                 if(res.status == 200){
                     _this.projects = res.data.data;
+
+
+                    $('.ui.progress').progress('complete');
                 }
             }).catch(err => {
                 console.log(err);
                 _this.projects = [];
+                $('.ui.progress').progress('set error');
             }).then(res => {
                 _this.projectsLoading = false;
+
+
+                $('.ui.progress').progress('complete');
             });
         },
         addProject(){

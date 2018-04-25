@@ -2,136 +2,121 @@
     <div>
         <div class="row">
             <div class="col">
-                <h1 class="ui header">Project Name</h1>
-                <div class="ui tiny breadcrumb mb-5">
-                    <router-link :to="{  name : 'dashboard.index' }" class="section">Dashboard</router-link>
-                    <i class="right chevron icon divider"></i>
-                    <router-link :to="{  name : 'projects.index' }" class="section">Projects</router-link>
-                    <i class="right chevron icon divider"></i>
-                    <div class="active section">Project Name</div>
+                <div class="ui segment">
+                    <template v-if="loading">
+                        <div class="p-5">
+                            <div class="ui tiny teal progress"  data-value="30" data-total="100" >
+                                <div class="bar"></div>
+                                <div class="label">Loading Project Data..</div>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <template v-if="project">
+                            <div class="text-center p-5">
+                                <h3 class="ui header text-uppercase">
+                                    <div class="sub header">Created {{ createdAt }} </div>
+                                    {{ project.name }}
+                                </h3>
+                                <p class="w-75 mx-auto text-gray">
+                                    <a href="#" class="ui tiny teal button text-uppercase mx-auto">Edit Project</a>
+                                </p>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="p-5">
+                                <div class="ui tiny teal progress"  data-value="30" data-total="100" >
+                                    <div class="bar"></div>
+                                    <div class="label">Loading Failed</div>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
                 </div>
             </div>
         </div>
-        <template v-if="project">
-            <div class="row">
-                <div class="col-md-6 mb-5">
-                    <div class="ui raised segments">
-                        <div class="ui segment">
-                            <h3>Overview</h3>
-                        </div>
-                        <div class="ui segment">
-                            <h3 class="ui header">
-                                <i class="globe icon"></i>
-                                <div class="content">
-                                    {{ project.name }}
-                                    <div class="sub header"> Created {{ createdAt }}</div>
-                                </div>
-                            </h3>
-                        </div>
-                        <div class="ui segment">
-                            <button class="ui mini positive button">Edit Project</button>
-                            <button class="ui mini icon button"><i class="trash icon"></i></button>
-                        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <div class="ui segment mt-5 p-5">
+                    <a href="#" class="ui tiny right floated teal icon button"  data-tooltip="Refresh Data"><i class="icon sync"></i></a>
+                    <h4 class="ui header text-uppercase d-inline">
+                        <div class="sub header">April 25, 2018 </div>
+                        Today
+                    </h4>
+                    <div class="ui divider"> </div>
+                    <div style="padding-top:10px;">
+                        <line-chart :chart-data="project.data" :height="100"/>
                     </div>
-                </div>
-                <div class="col-md-12 mb-5">
-                    <div class="ui raised segments">
-                        <div class="ui segment">
-                            <h3>Backups</h3>
-                        </div>
-                        <div class="ui segment">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <h4 class="ui header">
-                                        <i class="clock icon"></i>
-                                        <div class="content">
-                                            2 days ago
-                                            <div class="sub header">Latest Backup</div>
-                                        </div>
-                                    </h4>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <h4 class="ui header">
-                                        <i class="hourglass half icon"></i>
-                                        <div class="content">
-                                            2 days from now
-                                            <div class="sub header">Scheduled Backup</div>
-                                        </div>
-                                    </h4>
-                                </div>
-                                <div class="col-md-6">
-                                    <h4 class="ui header">
-                                        <i class="save icon"></i>
-                                        <div class="content">
-                                            248 Megabytes
-                                            <div class="sub header">Size of Last Backup</div>
-                                        </div>
-                                    </h4>
-                                </div>
-                                <div class="col-md-6">
-                                    <h4 class="ui header">
-                                        <i class="server icon"></i>
-                                        <div class="content">
-                                            2.5 Gigabytes
-                                            <div class="sub header">Size of All Backups</div>
-                                        </div>
-                                    </h4>
-                                </div>
-                            </div>
-                        </div>
-                        <table class="ui compact celled attached table">
-                            <thead>
-                                <tr>
-                                    <th> Description </th>
-                                    <th> Backup Status </th>
-                                    <th> Created At</th>
-                                    <th> Started At</th>
-                                    <th> Failed At</th>
-                                    <th> Finished At</th>
-                                    <th> Action </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template v-if="project.backups.length">
-                                    <tr v-for="backup in project.backups">
-                                        <td> {{ backup.description }} </td>
-                                        <td> {{ backup.status }} </td>
-                                        <td> {{ timeAgo(backup.created_at) }} <br> <small>{{ timeDefault(backup.created_at) }}</small> </td>
-                                        <td> {{ timeAgo(backup.backup_started_at) }} <br> <small>{{ timeDefault(backup.backup_started_at) }}</small> </td>
-                                        <td> {{ timeAgo(backup.backup_failed_at) }} <br> <small>{{ timeDefault(backup.backup_failed_at) }}</small> </td>
-                                        <td> {{ timeAgo(backup.backup_finished_at) }} <br> <small>{{ timeDefault(backup.backup_finished_at) }}</small> </td>
-                                        <td>
-                                            <div class="ui icon buttons">
-                                                <button class="ui button"><i class="download icon"></i></button>
-                                                <button class="ui button"><i class="trash icon"></i></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                        <div class="ui bottom attached segment">
-                            <button class="ui mini positive button" @click.prevent.self="backupProject(project.id,$event)">Backup Now</button>
-                        </div>
-                    </div>
+                    <div class="ui hidden divider"> </div>
+                    <p class="w-75 mx-auto text-gray text-center">
+                        <a href="#" class="ui tiny gray button text-uppercase mx-auto">View History</a>
+                    </p>
                 </div>
             </div>
-        </template>
+            <div class="col-6">
+                <div class="ui segment mt-5 p-5">
+                    <a href="#" class="ui tiny right floated teal icon button"  data-tooltip="Backup Now"><i class="icon play"></i></a>
+                    <h4 class="ui header text-uppercase d-inline">
+                        <div class="sub header">Latest Backup </div>
+                        2 days ago
+                    </h4>
+                    <div class="ui divider"> </div>
+                    <div class="ui list">
+                        <div class="item">
+                            <i class="clock icon"></i>
+                            <div class="content">
+                                <div class="header">05:30</div>
+                                <div class="description">Total back up time</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <i class="save icon"></i>
+                            <div class="content">
+                                <div class="header">256 MB</div>
+                                <div class="description">Size of back up file</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <i class="fast forward icon"></i>
+                            <div class="content">
+                                <div class="header">06 days 12 hrs</div>
+                                <div class="description">Next scheduled backup</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui hidden divider"> </div>
+                    <p class="w-75 mx-auto text-gray text-center">
+                        <a href="#" class="ui tiny gray button text-uppercase mx-auto">View all backups</a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
+import LineChart from '../components/charts/BarChart'
 import * as moment from 'moment-timezone';
 export default {
     data(){
         return {
+            loading : true,
             project : false
         }
     },
     mounted(){
         moment.tz.setDefault("UTC");
         moment.utc();
+
+        $('.ui.progress').progress();
+
         this.getProjectData();
+
+
+    },
+    components: {
+        LineChart
     },
     computed: {
         id () {
@@ -163,11 +148,20 @@ export default {
         },
         getProjectData(){
             let _this = this;
-
+            _this.loading = true;
             // Get Information about this project
             axios.get('/projects/' + this.id)
             .then( response => {
                 _this.project = response.data.project
+            }).catch(err => {
+                console.log(err);
+                _this.project = false;
+                $('.ui.progress').progress('set error');
+            }).then(res => {
+
+                _this.loading = false;
+
+                $('.ui.progress').progress('complete');
             });
         },
         backupProject(id,event){

@@ -1,69 +1,77 @@
-@extends('layouts.app')
+@extends('layouts.master')
 
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">Login</div>
+    <div id="app" class="container fullheight bg-gray" style="    flex-direction: column; display: flex;">
+        <header class="row align-items-start py-5">
+            <div class="container">
+                <p>
+                    {{-- Header --}}
+                </p>
+            </div>
+        </header>
+        <div class="row align-items-center flex-1">
+            <div class="col p-5">
+                <div class="container">
+                    <div class="row align-items-center px-3">
+                        <div class="col-md-4 d-block">
+                            <form class="ui form bg-gray-3 p-5 rounded" action="{{ route('login') }}" method="POST">
+                                {{ csrf_field() }}
 
-                <div class="panel-body">
-                    <form class="form-horizontal" method="POST" action="{{ route('login') }}">
-                        {{ csrf_field() }}
-
-                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                            <label for="email" class="col-md-4 control-label">E-Mail Address</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
-
-                                @if ($errors->has('email'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                            <label for="password" class="col-md-4 control-label">Password</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control" name="password" required>
-
-                                @if ($errors->has('password'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-6 col-md-offset-4">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Remember Me
-                                    </label>
+                                <div class="text-center">
+                                    <small><b>LOGIN NOW</b></small>
+                                    <h2 class="ui header mt-0">
+                                        Sign in to Dashboard
+                                    </h2>
                                 </div>
-                            </div>
-                        </div>
+                                <div class="ui divider">
 
-                        <div class="form-group">
-                            <div class="col-md-8 col-md-offset-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Login
-                                </button>
-
-                                <a class="btn btn-link" href="{{ route('password.request') }}">
-                                    Forgot Your Password?
-                                </a>
-                            </div>
+                                </div>
+                                <div class="field">
+                                    <label class="">E-Mail Address</label>
+                                    <input type="email" name="email" value="{{ old('email') }}" required autofocus>
+                                </div>
+                                @if ($errors->has('email'))
+                                    <div class="ui error visible message">
+                                        <div class="header">Oops!</div>
+                                        <p>{{ $errors->first('email') }}</p>
+                                    </div>
+                                @endif
+                                <div class="field">
+                                    <label class="">Password</label>
+                                    <input type="password" name="password" required >
+                                </div>
+                                @if ($errors->has('password'))
+                                    <div class="ui error visible message">
+                                        <div class="header">Oops!</div>
+                                        <p>{{ $errors->first('password') }}</p>
+                                    </div>
+                                @endif
+                                <button class="ui submit button btn-teal">Submit</button>
+                            </form>
                         </div>
-                    </form>
+                        <div class="col-md-8">
+                            <p>
+                                &nbsp;
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <footer class="row align-items-end py-5">
+            <div class="container">
+                <p>
+                    {{-- Footer --}}
+                </p>
+            </div>
+        </footer>
     </div>
-</div>
 @endsection
+
+@push('styles')
+    <style>
+    body{
+            background: #414854;
+    }
+    </style>
+@endpush

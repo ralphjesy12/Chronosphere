@@ -11,7 +11,8 @@
         "laravel/passport": "~4.0",
         "laravel/tinker": "~1.0",
         "spatie/db-dumper": "^2.9",
-        "spatie/laravel-backup": "^5.5"
+        "spatie/laravel-backup": "^5.5",
+        "spatie/laravel-uptime-monitor": "^3.3"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
@@ -21,6 +22,9 @@
         "symfony/thanks": "^1.0"
     },
     "autoload": {
+        "files": [
+            "app/Helpers.php"
+        ],
         "classmap": [
             "database/seeds",
             "database/factories"
