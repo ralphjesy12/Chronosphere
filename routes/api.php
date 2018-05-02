@@ -21,3 +21,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::middleware('auth:api')->get('/directory/path/{folder}', 'DirectoryController@getPath');
 Route::middleware('auth:api')->get('/directory/check', 'DirectoryController@checkPath');
 Route::middleware('auth:api')->get('/database/check', 'DirectoryController@checkDatabase');
+Route::middleware('auth:api')->get('/project/{project}/ping', 'ProjectController@apiGetPing');

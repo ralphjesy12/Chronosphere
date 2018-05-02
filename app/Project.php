@@ -26,4 +26,33 @@ class Project extends Model
         return $this->hasMany('App\Backup');
     }
 
+    public function meta()
+    {
+        return $this->hasMany('App\ProjectMeta');
+    }
+    
+    public function pings()
+    {
+        return $this->hasMany('App\Ping');
+    }
+
+    public function scopeProfile()
+    {
+        $metas = $this->meta();
+
+        if($metas->count()){
+            $metas = $metas->get()->keyBy('key')->map(function($meta){
+                return $meta['value'];
+            });
+
+            foreach ($metas as $key => $value) {
+                $this->{$key} = $value;
+            }
+
+        }
+
+        return $this;
+
+    }
+
 }

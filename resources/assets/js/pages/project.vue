@@ -37,7 +37,7 @@
         </div>
 
         <div class="row">
-            <div class="col-6">
+            <div class="col-12">
                 <div class="ui segment mt-5 p-5">
                     <a href="#" class="ui tiny right floated teal icon button"  data-tooltip="Refresh Data"><i class="icon sync"></i></a>
                     <h4 class="ui header text-uppercase d-inline">
@@ -46,7 +46,7 @@
                     </h4>
                     <div class="ui divider"> </div>
                     <div style="padding-top:10px;">
-                        <line-chart :chart-data="project.data" :height="100"/>
+                        <time-chart :chart-data="chartData" :height="250"/>
                     </div>
                     <div class="ui hidden divider"> </div>
                     <p class="w-75 mx-auto text-gray text-center">
@@ -96,13 +96,36 @@
 </template>
 
 <script>
-import LineChart from '../components/charts/BarChart'
+import TimeChart from '../components/charts/TimeChart'
 import * as moment from 'moment-timezone';
 export default {
     data(){
         return {
             loading : true,
-            project : false
+            project : false,
+            chartData : {
+                labels: [  ],
+                datasets: [{
+                        label: 'Connect: ',
+                        data: [],
+                        backgroundColor: 'rgba(0, 181, 173, 0.8)',
+                    },
+                    {
+                        label: 'Name Lookup ',
+                        data: [],
+                        backgroundColor: 'rgba(0, 153, 145, 0.8)',
+                    },
+                    {
+                        label: 'Pre Transfer ',
+                        data: [],
+                        backgroundColor: 'rgba(0, 128, 121, 0.8)',
+                    },
+                    {
+                        label: 'Start Transfer ',
+                        data: [],
+                        backgroundColor: 'rgba(0, 102, 97, 0.8)',
+                    }]
+            }
         }
     },
     mounted(){
@@ -113,10 +136,9 @@ export default {
 
         this.getProjectData();
 
-
     },
     components: {
-        LineChart
+        TimeChart
     },
     computed: {
         id () {
@@ -146,6 +168,57 @@ export default {
 
             return theDate.utc().format('llll z');
         },
+        getProjectPings(){
+            // Get Pings Every Five Minute
+
+            let minutes = 5;
+            let _this = this;
+
+            axios.get('/api/project/' + _this.project.id + '/ping')
+            .then(function(response){
+                let data = response.data.data;
+                let chartData = _.clone(_this.chartData);
+                
+                // Reset Labels
+
+                chartData.labels = [];
+
+                for (var minute in data) {
+                    if (data.hasOwnProperty(minute)) {
+                        let datehere = new Date(data[minute].timestamp * 1000);
+                        chartData.datasets[0].data.push({
+                            t: datehere,
+                            y: parseFloat(data[minute].connect_time)
+                        });
+
+                        chartData.datasets[1].data.push({
+                            t: datehere,
+                            y: parseFloat(data[minute].namelookup_time)
+                        });
+
+                         chartData.datasets[2].data.push({
+                            t: datehere,
+                            y: parseFloat(data[minute].pretransfer_time)
+                        });
+
+                         chartData.datasets[3].data.push({
+                            t: datehere,
+                            y: parseFloat(data[minute].starttransfer_time)
+                        });
+
+                        chartData.labels.push(moment(datehere).format('LT'));
+                    }
+                }
+
+                _this.chartData = chartData;
+
+            }).then(function(response){
+                setTimeout(function () {
+                    _this.getProjectPings();
+                }, minutes * 60 * 1000); // milliseconds
+            }); // do nothing for error - leaving old content.
+
+        },
         getProjectData(){
             let _this = this;
             _this.loading = true;
@@ -153,6 +226,9 @@ export default {
             axios.get('/projects/' + this.id)
             .then( response => {
                 _this.project = response.data.project
+
+
+                _this.getProjectPings();
             }).catch(err => {
                 console.log(err);
                 _this.project = false;

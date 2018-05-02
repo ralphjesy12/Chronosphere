@@ -5,6 +5,9 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
+use App\Project;
+use App\Jobs\PingWebsite;
+
 class Kernel extends ConsoleKernel
 {
     /**
@@ -26,6 +29,14 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('monitor:check-uptime')->everyMinute();
         $schedule->command('monitor:check-certificate')->daily();
+
+        $projects = Project::all();
+
+        foreach ($projects as $key => $project) {
+            if(!empty($url = $project->profile()->url)){
+                $schedule->job(new PingWebsite($project))->cron('0/5 * * * *')->withoutOverlapping();
+            }
+        }
     }
 
     /**

@@ -6,34 +6,38 @@ export default {
     mixins: [reactiveProp],
     data: () => ({
         options: {
-            cornerRadius: 2,
+            cornerRadius: 0,
             responsive: true,
             maintainAspectRatio: false,
             legend: {
-                display: false
+                display: true
             },
             scales: {
                 xAxes: [{
-                    labels: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+                    time: {
+                        unit: 'hour'
+                    },
                     barPercentage: 0.5,
+                    stacked: true,
                 }],
                 yAxes: [{
-                    display: false
+                    display: false,
+                    stacked: true,
                 }]
             },
             tooltips: {
+                mode: 'index',
+                intersect: false,
                 callbacks: {
-                    // Use the footer callback to display the sum of the items showing in the tooltip
-                    title: function(tooltipItems, data) {
-                        return data.labels[tooltipItems[0].index];
-                    },
+                    label: function(tooltipItem, data) {
+                        return tooltipItem.yLabel.toFixed(2) + 'ms';
+                    }
                 },
             }
         }
     }),
 
     mounted() {
-        console.log(this.chartData);
         this.renderChart(this.chartData, this.options)
     }
 }

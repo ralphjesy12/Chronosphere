@@ -51,9 +51,12 @@ class ProjectController extends Controller
         if($urls = $request->get('project')['url']){
 
             foreach ($urls as $key => $url) {
-                // $exitCode = Artisan::callSilent('monitor:create', [
-                //     'url' => $url, '--queue' => 'default'
-                // ]);
+                if(empty(trim($url))) continue;
+                $project->meta()->updateOrCreate([
+                    'key' => 'url'
+                ],[
+                    'value' => $url
+                ]);
             }
 
         }
@@ -145,6 +148,68 @@ class ProjectController extends Controller
 
         return response()->json([
             'status' => 'Project Backup queued successfully!'
+        ]);
+    }
+
+    public function apiGetPing(Request $request,Project $project){
+
+        $from = now()->subHour(1);
+        $to = now();
+
+        $data = [];
+
+        $startOfDay = today();
+
+        $pings = $project->pings()->oldest()->where([
+            [ 'created_at' , '>' , $from ],
+            [ 'created_at' , '<' , $to ],
+            [ 'http_code' , '=' , 200 ],
+            [ 'total_time' , '>' , 0]
+        ])->get();
+
+        $goFrom = $startOfDay->diffInMinutes($from);
+        $goTo = $startOfDay->diffInMinutes($to);
+
+        $goFrom -= $goFrom%10;
+
+        for ($i = $goFrom; $i <= $goTo; $i = $i+10) {
+
+            $time = today()->addMinute($i);
+
+            $data[$i] = [
+                'time' => $time,
+                'timestamp' => $time->timestamp,
+                'connect_time' => 0,
+                'namelookup_time' => 0,
+                'pretransfer_time' => 0,
+                'starttransfer_time' => 0,
+                'total_time' => 0,
+            ];
+
+        }
+
+        foreach ($pings as $key => $ping) {
+
+            $minuteOfTheDay = $startOfDay->diffInMinutes($ping->created_at);
+
+            $minuteOfTheDay -= $minuteOfTheDay%10;
+
+            $time = today()->addMinute($minuteOfTheDay);
+
+            $data[$minuteOfTheDay] = [
+                'time' => $time,
+                'timestamp' => $time->timestamp,
+                'connect_time' => $ping->connect_time,
+                'namelookup_time' => $ping->namelookup_time,
+                'pretransfer_time' => $ping->pretransfer_time,
+                'starttransfer_time' => $ping->starttransfer_time,
+                'total_time' => $ping->total_time,
+            ];
+
+        }
+
+        return response()->json([
+            'data' => $data,
         ]);
     }
 }
